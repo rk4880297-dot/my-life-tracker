@@ -30,28 +30,29 @@ jobs:
       - name: Install Dependencies and Build
         run: |
           cd "$PROJECT_DIR"
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          npm install
           npm run build
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '17
+          
+        - name: Setup Android SDK
+          uses: android-actions/setup-android@v3
+          with:
+            packages: |
+              platform-tools
+              platforms;android-35
+              build-tools;35.0.0
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        - name: Sync Capacitor Android
+          run: |
+            cd "$PROJECT_DIR"
+            npx cap sync android
 
-      - name: Sync Capacitor Android
-        run: |
-          cd "$PROJECT_DIR"
-          npx cap sync android
-
-      - name: Build APK
+        - name: Build APK
         run: |
           cd "$PROJECT_DIR/android"
           chmod +x gradlew
