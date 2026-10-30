@@ -20,12 +20,15 @@ jobs:
         run: |
           mkdir app-src
           unzip -q my-life-tracker-source.zip -d app-src
+
           PROJECT_DIR=$(find app-src -name package.json -not -path '*/node_modules/*' -printf '%h\n' | head -n 1)
+
           if [ -z "$PROJECT_DIR" ]; then
             echo "Error: package.json not found in ZIP"
             exit 1
           fi
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,8 +39,10 @@ jobs:
         run: |
           cd "$PROJECT_DIR"
           npm install
+
           REACT_MAJOR=$(node -p "require('./node_modules/react/package.json').version.split('.')[0]")
           npm install "react-is@$REACT_MAJOR"
+
           npm run build
 
       - name: Setup Java
@@ -47,12 +52,17 @@ jobs:
           java-version: '17'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
 
       - name: Install Android SDK Packages
         run: |
-          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses
-          sdkmanager --sdk_root="$ANDROID_HOME" --install \
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+
+          echo "Using Android SDK: $SDK_ROOT"
+
+          sdkmanager --sdk_root="$SDK_ROOT" --install \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
