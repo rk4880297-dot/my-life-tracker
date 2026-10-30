@@ -1,3 +1,4 @@
+
 name: Build My Life Tracker APK
 
 on:
@@ -20,6 +21,10 @@ jobs:
           mkdir app-src
           unzip -q my-life-tracker-source.zip -d app-src
           PROJECT_DIR=$(find app-src -name package.json -not -path '*/node_modules/*' -printf '%h\n' | head -n 1)
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "Error: package.json not found in ZIP"
+            exit 1
+          fi
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
       - name: Setup Node.js
@@ -31,6 +36,8 @@ jobs:
         run: |
           cd "$PROJECT_DIR"
           npm install
+          REACT_MAJOR=$(node -p "require('./node_modules/react/package.json').version.split('.')[0]")
+          npm install "react-is@$REACT_MAJOR"
           npm run build
 
       - name: Setup Java
@@ -64,3 +71,4 @@ jobs:
           name: My-Life-Tracker-Debug-APK
           path: ${{ env.PROJECT_DIR }}/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          
