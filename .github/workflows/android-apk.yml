@@ -37,22 +37,22 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17
-          
-        - name: Setup Android SDK
-          uses: android-actions/setup-android@v3
-          with:
-            packages: |
-              platform-tools
-              platforms;android-35
-              build-tools;35.0.0
+          java-version: '17'
 
-        - name: Sync Capacitor Android
-          run: |
-            cd "$PROJECT_DIR"
-            npx cap sync android
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
 
-        - name: Build APK
+      - name: Sync Capacitor Android
+        run: |
+          cd "$PROJECT_DIR"
+          npx cap sync android
+
+      - name: Build APK
         run: |
           cd "$PROJECT_DIR/android"
           chmod +x gradlew
