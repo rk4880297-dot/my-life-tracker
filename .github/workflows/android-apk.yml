@@ -33,7 +33,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22'
+
+      - name: Verify Node.js Version
+        run: |
+          node --version
+          npm --version
+          node -e "if (Number(process.versions.node.split('.')[0]) < 22) process.exit(1)"
 
       - name: Install Dependencies and Build
         run: |
@@ -84,5 +90,4 @@ jobs:
           name: My-Life-Tracker-Debug-APK
           path: ${{ env.PROJECT_DIR }}/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-
           
